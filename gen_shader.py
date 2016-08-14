@@ -1,6 +1,5 @@
 import re
 
-
 class ModuleData:
 	def __init__(self, name, content):
 		self.name = name.replace(" ", "")
@@ -10,27 +9,61 @@ class ModuleData:
 
 import_modules = dict()
 
-
-def match1(line):
-	v = re.match(re.compile('#pragma glsipy: (.+?) = require\(\"(.+?)\"\)'), line)
-	if v is None:
-		v = re.match(re.compile("#pragma glsipy: (.+?) = require\(\'(.+?)\'\)"), line)
-		if v is None:
-			v = re.match(re.compile("#pragma glsipy: (.+?) = require\((.+?)\)"), line)
+items1 = [
+	re.compile('#pragma glsipy: (.+?) = require\(\'(.+?)\'\)'),
+	re.compile("#pragma glsipy: (.+?) = require\(\"(.+?)\"\)"),
+	re.compile("#pragma glsipy: (.+?) = require\((.+?)\)")
+]
+items2 = [
+	re.compile('#pragma export\(\'(.+?)\'\)'),
+	re.compile("#pragma export\(\"(.+?)\"\)"),
+	re.compile("#pragma export\((.+?)\)")
+]
+items3 = [
+	re.compile('#pragma glsipy: export\(\'(.+?)\'\)'),
+	re.compile("#pragma glsipy: export\(\"(.+?)\"\)"),
+	re.compile("#pragma glsipy: export\((.+?)\)")
+]
+def match(items, line):
+	for item in items:
+		v = re.match(item, line)
+		if not v is None:
+			return v
 	return v
 
-def match2(line):
-	v = re.match(re.compile("#pragma export\(\'(.+?)\'\)"), line)
-	if v is None:
-		v = re.match(re.compile("#pragma export\(\"(.+?)\"\)"), line)
-		if v is None:
-			v = re.match(re.compile("#pragma export\((.+?)\)"), line)
-	return v
+def format_key(key):
+	return key.replace("\"", "").replace('\'', "")
 
-def read_file(file, is_module, mod, others = []):
+def format_values(values):
+	if(len(values) > 0):
+		values = [x.replace(" ", "") for x in values]
+		values = dict(s.split('=') for s in values)
+	else: 
+		values = dict()
+	return values
+
+frag_repeat = []
+
+def read_file(file, exit_src, minification):
+	global frag_repeat
+	frag_repeat = []
+	content = __read_file__(file, False)
+	content = ''.join( content )
+	
+	with open(exit_src, 'w') as file_:
+		if minification is True:
+			content = content.split("\n");
+			file_.write(content[0] + "\n")
+			del content[0]
+			content = "".join(content).replace('\t', ' ')
+			file_.write(content)
+		else:
+			file_.write(content)
+
+def __read_file__(file, is_module, mod = "", others = []):
 	#print mod
 	if is_module:
-		#print mod + " " + file
+		print mod + "~>" + file
 		if mod in import_modules:
 			print(mod + " repeated")
 			return import_modules[mod].content 
@@ -39,59 +72,38 @@ def read_file(file, is_module, mod, others = []):
 		for line in ins:
 			#print line
 			if line.startswith("#pragma glsipy:"):
-				v = match1(line)
+				v = match(items1, line)	#
 				if not v is None:
-					if not v.group(1) in import_modules:
+					if not v.group(1) in frag_repeat:
+						frag_repeat.append(v.group(1))
 						values = v.group(2).split(",")
-						key = values[0]
+						key = format_key(values[0])
 						del values[0]
-						array = array + read_file(key, True, v.group(1), values)
+						array += __read_file__(key, True, v.group(1), format_values(values))
 			elif line.startswith("#pragma export"):
-				v = match2(line)
+				v = match(items2, line)
 				if not v is None:
-					print v.group(1)
-					a = [x.replace(" ", "") for x in others]
-
-					d = dict(s.split('=') for s in a)
-					for k, v in d.items():
+					for k, v in others.items():
 						array = [s.replace(k, v) for s in array]
 			else:
 				array.append(line)
 
 		if is_module:
-			pass
-			#print line
-			v = re.match(r"#pragma glsipy: export\((.+?)\)", line)
-			#print v.group(1)
+			v = match(items3, line)	# line value is the last value of file
 			if not v is None:
 				import_modules[v.group(1)] = ModuleData(file, array)
 
 		return array
 
 if __name__ == "__main__":
-	content = read_file("shader.glsl", False, "")
+	print "FILE 1"
+	read_file("foo.glsl", "finalShader.glsl", False)
 
-	# Remove lines who contains "#pragma"
-	content = [line for line in content if not line.startswith("#pragma")]
+	print "FILE 2"
+	read_file("demo2.glsl", "finalShader2.glsl", False)
 
-	content = ''.join( content )
-	#print ("-----------------------------");
-	#print ("-----------------------------");
-	#print ("-----------------------------");
-	#print ("-----------------------------");
-	#print ("-----------------------------");
-	#print (content)
-
-	with open('finalShader.glsl', 'w') as file_:
-		#content = content.split("\n");
-		#file_.write(content[0] + "\n")
-		#del content[0]
-		#content = "".join(content)
-		#content = content.replace('\t', ' ')
-		#print (content)
-		#file_.write(content)
-		print (content)
-		file_.write(content)
+	print "FILE 3"
+	read_file("shader.glsl", "finalShader3.glsl", False)
 	
 	#for k, v in import_modules.items():
 	#	print ("KEY= " + k + ", VALUE= " + str(v))

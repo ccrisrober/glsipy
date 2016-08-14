@@ -1,0 +1,5 @@
+#pragma glsipy: Material = require("./dir/material.glsl")
+#pragma glsipy: PointLight = require('./light.glsl')
+#pragma glsipy: Cristian = require('./cristian.glsl')
+#pragma glsipy: Material = require("./dir/material.glsl")
+#pragma glsipy: blinnPhong = require("./blinn.glsl")
