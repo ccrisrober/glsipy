@@ -1,1 +1,0 @@
-#pragma glsipy: Cristian = require('./light.glsl')

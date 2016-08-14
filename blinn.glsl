@@ -1,4 +1,4 @@
-#pragma glsipy: Material = require("./material.glsl")
+#pragma glsipy: Material = require("./dir/material.glsl")
 #pragma glsipy: PointLight = require('./light.glsl')
 #pragma glsipy: Cristian = require('./cristian.glsl')
 vec3 blinnPhong (Material material, PointLight light) {
