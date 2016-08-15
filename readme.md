@@ -1,5 +1,7 @@
 # glsipy
 Python module based on glsify.
+A python-style module system for GLSL!
+
 ```bash
 python gen_shader.py input output minification
 ```
