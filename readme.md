@@ -26,7 +26,7 @@ Module name same as previous module export section
 ```
 
 ### Higher-order function
-#### Define module export
+- Define module export
 ```glsl
 # example.glsl
 float func(float);
@@ -36,7 +36,7 @@ float derivative(float t, float epsilon) {
 }
 #pragma export(example)
 ```
-#### Import module export
+- Import module export
 ```glsl
 #pragma glsipy: example = require('./example.glsl', func = myfunc, func2 = phongShading)
 float myfunc(float t) {
