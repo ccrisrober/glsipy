@@ -39,4 +39,4 @@ if __name__ == "__main__":
 		exit_src = sys.argv[2]
 		minification = str2bool(sys.argv[3])
 		
-		ss.read_file(entry_src, exit_src, minification)
+		ss.gen_file(entry_src, exit_src, minification)

@@ -4,6 +4,7 @@ Python module based on glsify.
 A python-style module system for GLSL!
 
 ```bash
+# Generate
 python gen_shader.py input output minification
 ```
 - input: Shader input file (String)
@@ -16,6 +17,21 @@ python gen_shader.py entry.glsl output.glsl False
 ```
 
 ## How to use
+
+### Dump final shader to file
+```python
+entry_src = sys.argv[1]
+exit_src = sys.argv[2]
+minification = str2bool(sys.argv[3])
+ss.gen_file(entry_src, exit_src, minification)
+```
+
+### Dump final shader to return method
+```python
+entry_src = sys.argv[1]
+minification = str2bool(sys.argv[2])
+content = ss.read_file(entry_src, minification)
+```
 
 ### Define module export:
 ```glsl
