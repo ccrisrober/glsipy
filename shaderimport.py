@@ -64,12 +64,44 @@ class ShaderCompiler:
 	def __init__(self):
 		self.frag_repeat = []
 
-	def read_file(self, file, exit_src, minification):
+	'''
+	Returns a shader file content with all imports correct
+	@type file: string
+	@param file: Shader file input
+	@type minification: boolean
+	@param minification: Minification file (Default: False)
+	@rtype string
+	@return Shader output content
+	'''
+	def read_file(self, file, minification = False):
 		self.frag_repeat = []
 
 		dir_path = os.path.dirname(os.path.realpath(os.getcwd() + "/" + file)) + "/../"
 		#print "dir_path=>" + dir_path
-		#print "dpath=>" + "C:\Users\maldicion069\Desktop\glsify python"
+		
+		content = ''.join(self.__read_file__(dir_path, file, False))
+		
+		if minification is True:
+			content = content.split("\n");
+			file_.write(content[0] + "\n")
+			del content[0]
+			content = "".join(content).replace('\t', ' ')
+		return content
+
+	'''
+	Generate a shader output file with entry shader
+	@type file: string
+	@param file: Shader file input
+	@type exit_src: string
+	@param exit_src: Shader file output
+	@type minification: boolean
+	@param minification: Minification file (Default: False)
+	'''
+	def gen_file(self, file, exit_src, minification = False):
+		self.frag_repeat = []
+
+		dir_path = os.path.dirname(os.path.realpath(os.getcwd() + "/" + file)) + "/../"
+		#print "dir_path=>" + dir_path
 		
 		content = ''.join(self.__read_file__(dir_path, file, False))
 		
