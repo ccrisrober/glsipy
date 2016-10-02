@@ -1,15 +1,13 @@
-Conrad "Cronos" Lant
+#version 430
+
+out vec4 fragColor;
 
 float position(float);
 vec3 normal(vec4 v);
 float derivative(float t, float epsilon) {
-	return 0.5 * (position(t+epsilon) - position(t-epsilon));
+	return 0.5 * (position(t+epsilon) - normal(vec4(vec3(t-epsilon), 1.0));
 }
 
-void main() {
-	vec3 color = vec3(0,0,0);
-	gl_FragColor = vec4(color, 1.0);
-}
 float position(float t) {
 	return 0.5 * t * t - t + 1.0;
 }
@@ -23,10 +21,18 @@ float anthrax() {
 vec3 slayer() {
 	return vec3(1.0);
 };
-VAMPIRO
+const vec3 vampiro = vec3(6.0, 6.0, 6.0);
 struct PointLight {
 	vec3 position;
 	vec3 diffuse;
 	vec3 ambient;
 };
-PAPA, NO ROBES
+vec3 omg() {
+	return vec3(1.0);
+}
+
+void main() {
+	vec3 omg = omg();
+	float dev = derivative(omg.x, omg.y);
+	fragColor = normal(vec4(vampiro, dev));
+}

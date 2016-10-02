@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*- 
 '''
 Copyright (c) 2016, maldicion069 (Cristian Rodríguez) <ccrisrober@gmail.con>
 //
@@ -19,19 +20,19 @@ import sys
 
 from shaderimport import *
 
-ss = ShaderCompiler()
+ss = ShaderCompiler(["./partials"])
 
 def str2bool(v):
 	return v.lower() in ("yes", "true", "t", "1", "True", "Yes", "T")
 
 if __name__ == "__main__":
 
-	'''
-	entry_src = "./examples/jaja.glsl"
+	
+	entry_src = "./jojo.glsl"
 	exit_src = "_ok.glsl"
 	minification = False
 	
-	ss.read_file(entry_src, exit_src, minification)
+	ss.gen_file(entry_src, exit_src, minification)
 	'''
 
 	if len(sys.argv) == 4:
@@ -40,3 +41,4 @@ if __name__ == "__main__":
 		minification = str2bool(sys.argv[3])
 		
 		ss.gen_file(entry_src, exit_src, minification)
+	'''

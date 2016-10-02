@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*- 
 '''
 Copyright (c) 2016, maldicion069 (Cristian Rodríguez) <ccrisrober@gmail.con>
 //
@@ -61,32 +62,9 @@ class ShaderCompiler:
 			values = dict()
 		return values
 
-	def __init__(self):
+	def __init__(self, directories = []):
+		self.directories = ["./"] + directories + ["./examples"]
 		self.frag_repeat = []
-
-	'''
-	Returns a shader file content with all imports correct
-	@type file: string
-	@param file: Shader file input
-	@type minification: boolean
-	@param minification: Minification file (Default: False)
-	@rtype string
-	@return Shader output content
-	'''
-	def read_file(self, file, minification = False):
-		self.frag_repeat = []
-
-		dir_path = os.path.dirname(os.path.realpath(os.getcwd() + "/" + file)) + "/../"
-		#print "dir_path=>" + dir_path
-		
-		content = ''.join(self.__read_file__(dir_path, file, False))
-		
-		if minification is True:
-			content = content.split("\n");
-			file_.write(content[0] + "\n")
-			del content[0]
-			content = "".join(content).replace('\t', ' ')
-		return content
 
 	'''
 	Generate a shader output file with entry shader
@@ -100,10 +78,10 @@ class ShaderCompiler:
 	def gen_file(self, file, exit_src, minification = False):
 		self.frag_repeat = []
 
-		dir_path = os.path.dirname(os.path.realpath(os.getcwd() + "/" + file)) + "/../"
+		dir_path = os.path.dirname(os.path.realpath(os.getcwd() + "/" + file)) + "/"
 		#print "dir_path=>" + dir_path
 		
-		content = ''.join(self.__read_file__(dir_path, file, False))
+		content = ''.join(self.__read_file__(True, dir_path, file, False))
 		
 		with open(exit_src, 'w') as file_:
 			if minification is True:
@@ -119,8 +97,16 @@ class ShaderCompiler:
 		print "pt=>" + pt
 		'''
 
-	def __read_file__(self, dir_path, file, is_module, mod = "", others = []):
-		file = (dir_path + "/" + file)
+	'''
+	Returns a shader file content with all imports correct
+	@type file: string
+	@return Shader output content
+	'''
+	def __read_file__(self, is_rootfile, dir_path, file, is_module, mod = "", others = []):
+		#print (os.path.exists(dir_path + "/" + file))
+		print (os.path.abspath(dir_path + "/" + file))
+		#file = (dir_path + "/" + file)
+		file = os.path.abspath(dir_path + "/" + file)
 		#print file
 		#return [file]
 		#print mod
@@ -139,11 +125,25 @@ class ShaderCompiler:
 						if not v.group(1) in self.frag_repeat:
 							self.frag_repeat.append(v.group(1))
 							values = v.group(2).split(",")
+
 							key = self.__format_key__(values[0])
+							if is_rootfile:
+								key2 = key
+								founded = False
+								for route_dir in self.directories:
+									key2 = route_dir + "/" + key;
+									if os.path.exists(dir_path + "/" + key2):
+										key = key2
+										founded = True
+										break
+								if not founded:
+									raise Exception ("SHADER UNDEFINED")
+								print (os.path.abspath(dir_path + "/" + key))
+
 							del values[0]
 							pt = os.path.dirname(os.path.abspath(file))
 							#print pt
-							array += self.__read_file__(pt, key, True, v.group(1), self.__format_values__(values))
+							array += self.__read_file__(False, pt, key, True, v.group(1), self.__format_values__(values))
 				elif line.startswith("#pragma export"):
 					v_ = self.__match__(ShaderCompiler.items2, line)
 					if not v_ is None:
